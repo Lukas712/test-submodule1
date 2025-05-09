@@ -1,0 +1,28 @@
+name: Sync submodule commit to parent
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync-parent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout filho
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Sync with parent
+        run: |
+          git config --global user.name "GitHub Bot"
+          git config --global user.email "bot@example.com"
+
+          # Clona o pai
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Lukas712/repo-pai.git
+          cd repo-pai
+
+          git submodule update --remote --merge
+          git add microservico-a
+          git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}" || echo "Sem mudanças"
+          git push origin main
