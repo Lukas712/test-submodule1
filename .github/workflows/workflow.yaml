@@ -38,7 +38,7 @@ jobs:
           git submodule update --remote --merge
 
           # Pega a URL do repositório atual
-          current_repo_url=$(git config --get remote.origin.url)
+          current_repo_url="https://github.com/${{ github.repository }}.git"
 
           # Obtém o caminho do submódulo a partir do .gitmodules
           submodule_path=$(git submodule foreach 'echo $sm_path')
