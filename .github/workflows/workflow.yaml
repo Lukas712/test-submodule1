@@ -29,7 +29,7 @@ jobs:
 
       - name: Atualiza todos submódulos pra branch principal
         run: |
-          cd repo-pai
+          cd mono-repo-with-submodules
           git config user.name "GitHub Bot"
           git config user.email "bot@example.com"
           git submodule update --remote --merge
