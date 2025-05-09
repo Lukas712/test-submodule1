@@ -9,17 +9,19 @@ jobs:
       - name: Checkout filho
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Garante que o histórico completo de commits é obtido
 
       - name: Configura Git
         run: |
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
+
       - name: Captura a mensagem do último commit no repositório filho
         run: |
           commit_message=$(git log -1 --pretty=%B)
           repo_name="${GITHUB_REPOSITORY}"
           commit_message_with_repo="${commit_message} [Commit do repositório ${repo_name}]"
+          echo "commit_message_with_repo=$commit_message_with_repo" >> $GITHUB_ENV
 
       - name: Checkout repo-pai c/ submódulos
         uses: actions/checkout@v4
