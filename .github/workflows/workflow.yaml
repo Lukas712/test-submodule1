@@ -40,14 +40,21 @@ jobs:
           # Pega a URL do repositório atual
           current_repo_url="https://github.com/${{ github.repository }}.git"
 
-          # Obtém o caminho do submódulo a partir do .gitmodules
-          submodule_path=$(git submodule foreach 'echo $sm_path')
-
-          # Verifica se a URL do submódulo corresponde à URL do repositório atual
+          # Variável para armazenar a mensagem de commit do submódulo
           submodule_commit_message=""
+
+          # Itera sobre os submódulos e verifica a URL
           git submodule foreach '
-            if [[ "$sm_url" == "$current_repo_url" ]]; then
+            submodule_url=$(git config --get remote.origin.url)
+            
+            # Remover espaços extras antes e depois da URL
+            submodule_url=$(echo "$submodule_url" | xargs)
+            current_repo_url=$(echo "$current_repo_url" | xargs)
+
+            # Verifica se a URL do submódulo corresponde à URL do repositório atual
+            if [ "$submodule_url" = "$current_repo_url" ]; then
               submodule_commit_message=$(git log -1 --pretty=%B)
+              echo "Mensagem do commit do submódulo: $submodule_commit_message"
             fi
           '
 
@@ -56,4 +63,3 @@ jobs:
             git add .
             git diff --cached --quiet || ( git commit -m "$submodule_commit_message" && git push )
           fi
-
