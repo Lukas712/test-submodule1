@@ -45,10 +45,33 @@ jobs:
 
           # Itera sobre o arquivo .gitmodules para pegar o caminho e URL dos submódulos
           while IFS= read -r line; do
-            if [[ "$line" =~ path = (.*) ]]; then
+            if [[ "$line" =~ ^path\ =\ (.*) ]]; then
               submodule_path="${BASH_REMATCH[1]}"
-            elif [[ "$line" =~ url = (.*) ]]; then
+            elif [[ "$line" =~ ^url\ =\ (.*) ]]; then
               submodule_url="${BASH_REMATCH[1]}"
+
+              # Remover espaços extras antes e depois
+              submodule_url=$(echo "$submodule_url" | xargs)
+              target_submodule_url=$(echo "$target_submodule_url" | xargs)
 
               # Comparar o URL do submódulo com o URL original
               if [ "$submodule_url" = "$target_submodule_url" ]; then
+                submodule_found="true"
+                echo "Submódulo encontrado: $submodule_path"
+                break
+              fi
+            fi
+          done < .gitmodules
+
+          # Verifica se o submódulo foi encontrado
+          if [ "$submodule_found" = "false" ]; then
+            echo "Submódulo não encontrado para o URL fornecido: $target_submodule_url"
+            exit 1
+          fi
+
+          # Captura a mensagem do último commit do submódulo
+          submodule_commit_message=$(git log -1 --pretty=%B -- $submodule_path)
+
+          # Faz o commit no repositório pai com a mensagem do submódulo
+          git add .
+          git diff --cached --quiet || ( git commit -m "$submodule_commit_message" && git push )
