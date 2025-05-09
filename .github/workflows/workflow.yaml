@@ -38,7 +38,7 @@ jobs:
           git submodule update --remote --merge
 
           # URL do repositório original do submódulo que você quer comparar
-          target_submodule_url="https://github.com/usuario/submodulo.git"
+          target_submodule_url="https://github.com/${{ github.repository }}.git"
           
           # Encontrar o caminho do submódulo com o URL correspondente
           submodule_path=""
