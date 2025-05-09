@@ -46,8 +46,7 @@ jobs:
           # Verifica se a URL do submódulo corresponde à URL do repositório atual
           submodule_commit_message=""
           git submodule foreach '
-            submodule_url=$(git config --get remote.origin.url)
-            if [[ "$submodule_url" == "$current_repo_url" ]]; then
+            if [[ "$sm_url" == "$current_repo_url" ]]; then
               submodule_commit_message=$(git log -1 --pretty=%B)
             fi
           '
