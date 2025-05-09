@@ -7,8 +7,9 @@ on:
 jobs:
   sync-parent:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout filho
+      - name: Checkout repositório-filho (atual)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -18,7 +19,7 @@ jobs:
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
 
-      - name: Checkout repo-pai c/ submódulos
+      - name: Checkout repo-pai com submódulos
         uses: actions/checkout@v4
         with:
           repository: Lukas712/mono-repo-with-submodules
@@ -27,12 +28,18 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Atualiza todos submódulos pra branch principal
+      - name: Substitui conteúdo do submódulo pelo commit atual do repositório-filho
         run: |
           cd mono-repo-with-submodules
-          git config user.name "GitHub Bot"
-          git config user.email "bot@example.com"
-          git submodule update --remote --merge
-          git add .
-          git diff --cached --quiet || ( git commit -m "Sync submódulos" && git push )
 
+          # ⚠️ Substitua pelo caminho correto do submódulo dentro do repositório-pai
+          SUBMODULE_PATH=submodule-one
+
+          # Remove conteúdo antigo do submódulo
+          rm -rf $SUBMODULE_PATH/*
+
+          # Copia novo conteúdo (exceto .git e .github)
+          rsync -av --exclude='.git' --exclude='.github' ../ $SUBMODULE_PATH/
+
+          git add $SUBMODULE_PATH
+          git diff --cached --quiet || (git commit -m "Sync submódulo com commit atual do repositório-filho" && git push)
