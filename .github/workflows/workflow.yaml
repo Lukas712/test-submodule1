@@ -44,4 +44,4 @@ jobs:
           git submodule update --remote --merge
 
           git add .
-          git diff --cached --quiet || ( git commit -m "$commit_message" && git push )
+          git diff --cached --quiet || ( git commit -m "$commit_message_with_repo" && git push )
