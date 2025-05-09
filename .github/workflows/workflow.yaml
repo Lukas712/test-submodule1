@@ -20,7 +20,7 @@ jobs:
 
           # Clona o pai
           git clone https://x-access-token:${{ secrets.GH_TOKEN }}git@github.com:Lukas712/mono-repo-with-submodules.git
-          cd repo-pai
+          cd mono-repo-with-submodules
 
           git submodule update --remote --merge
           git add microservico-a
