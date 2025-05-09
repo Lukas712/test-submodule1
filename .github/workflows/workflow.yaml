@@ -33,19 +33,26 @@ jobs:
           cd mono-repo-with-submodules
           git config user.name "GitHub Bot"
           git config user.email "bot@example.com"
-
+          
           # Atualiza os submódulos
           git submodule update --remote --merge
 
           # URL do repositório original do submódulo que você quer comparar
           target_submodule_url="https://github.com/usuario/submodulo.git"
-
-          # Encontra o caminho do submódulo com o URL correspondente
-          submodule_path=$(git submodule foreach --quiet '
+          
+          # Encontrar o caminho do submódulo com o URL correspondente
+          submodule_path=""
+          git submodule foreach --quiet '
             if [ "$sm_url" == "$target_submodule_url" ]; then
-              echo $sm_path
+              submodule_path=$sm_path
             fi
-          ')
+          '
+
+          # Verificar se encontramos o submódulo
+          if [ -z "$submodule_path" ]; then
+            echo "Submódulo não encontrado para o URL fornecido: $target_submodule_url"
+            exit 1
+          fi
 
           # Captura a mensagem do último commit do submódulo
           submodule_commit_message=$(git log -1 --pretty=%B -- $submodule_path)
