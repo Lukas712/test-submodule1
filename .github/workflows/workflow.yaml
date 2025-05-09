@@ -18,18 +18,23 @@ jobs:
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
 
-      - name: Clone repo-pai e atualiza submódulo
+      - name: Clone repo-pai
         run: |
-          # Clone via HTTPS usando o GH_TOKEN
           git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Lukas712/mono-repo-with-submodules.git repo-pai
           cd repo-pai
 
-          # Atualiza o pointer do submódulo
-          git submodule update --remote --merge
+          # Inicializa e baixa o conteúdo dos submódulos
+          git submodule init
+          git submodule update --recursive
 
-          # Commit & push só se houver mudanças
+          # Agora a pasta microservico-a/ existe e podemos atualizar:
+          git submodule update --remote --merge microservico-a
+
           git add microservico-a
-          git diff --cached --exit-code || ( \
-            git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}" \
-            && git push origin main \
-          )
+          if ! git diff --cached --quiet; then
+            git config user.name "GitHub Bot"
+            git config user.email "bot@example.com"
+            git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}"
+            git push origin main
+          fi
+
