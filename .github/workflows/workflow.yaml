@@ -13,16 +13,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Sync with parent
+      - name: Configura Git
         run: |
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
 
-          # Clona o pai
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}git@github.com:Lukas712/mono-repo-with-submodules.git
-          cd mono-repo-with-submodules
+      - name: Clone repo-pai e atualiza submódulo
+        run: |
+          # Clone via HTTPS usando o GH_TOKEN
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Lukas712/mono-repo-with-submodules.git repo-pai
+          cd repo-pai
 
+          # Atualiza o pointer do submódulo
           git submodule update --remote --merge
+
+          # Commit & push só se houver mudanças
           git add microservico-a
-          git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}" || echo "Sem mudanças"
-          git push origin main
+          git diff --cached --exit-code || ( \
+            git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}" \
+            && git push origin main \
+          )
