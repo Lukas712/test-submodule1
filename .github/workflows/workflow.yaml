@@ -19,7 +19,7 @@ jobs:
           git config --global user.email "bot@example.com"
 
           # Clona o pai
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Lukas712/repo-pai.git
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}git@github.com:Lukas712/test-submodule1.git
           cd repo-pai
 
           git submodule update --remote --merge
