@@ -9,18 +9,17 @@ jobs:
       - name: Checkout filho
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Garante que o histórico completo de commits é obtido
+          fetch-depth: 0
 
       - name: Configura Git
         run: |
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
-
       - name: Captura a mensagem do último commit no repositório filho
         run: |
-          # Captura a mensagem do último commit no repositório filho
           commit_message=$(git log -1 --pretty=%B)
-          echo "commit_message=$commit_message" >> $GITHUB_ENV
+          repo_name="${GITHUB_REPOSITORY}"
+          commit_message_with_repo="${commit_message} [Commit do repositório ${repo_name}]"
 
       - name: Checkout repo-pai c/ submódulos
         uses: actions/checkout@v4
@@ -31,8 +30,8 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Espera 15 segundos para garantir visibilidade do commit
-        run: sleep 15
+      - name: Espera 5 segundos para garantir visibilidade do commit
+        run: sleep 5
 
       - name: Atualiza todos submódulos pra branch principal
         run: |
@@ -40,9 +39,7 @@ jobs:
           git config user.name "GitHub Bot"
           git config user.email "bot@example.com"
 
-          # Atualiza os submódulos
           git submodule update --remote --merge
 
-          # Faz o commit no repositório pai com a mensagem do último commit do repositório filho
           git add .
           git diff --cached --quiet || ( git commit -m "$commit_message" && git push )
