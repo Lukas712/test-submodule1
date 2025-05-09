@@ -18,23 +18,21 @@ jobs:
           git config --global user.name "GitHub Bot"
           git config --global user.email "bot@example.com"
 
-      - name: Clone repo-pai
+      - name: Checkout repo-pai c/ submódulos
+        uses: actions/checkout@v4
+        with:
+          repository: Lukas712/mono-repo-with-submodules
+          token: ${{ secrets.GH_TOKEN }}
+          path: mono-repo-with-submodules
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Atualiza todos submódulos pra branch principal
         run: |
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Lukas712/mono-repo-with-submodules.git repo-pai
           cd repo-pai
-
-          # Inicializa e baixa o conteúdo dos submódulos
-          git submodule init
-          git submodule update --recursive
-
-          # Agora a pasta microservico-a/ existe e podemos atualizar:
-          git submodule update --remote --merge microservico-a
-
-          git add microservico-a
-          if ! git diff --cached --quiet; then
-            git config user.name "GitHub Bot"
-            git config user.email "bot@example.com"
-            git commit -m "Atualização do submódulo microservico-a: ${{ github.sha }}"
-            git push origin main
-          fi
+          git config user.name "GitHub Bot"
+          git config user.email "bot@example.com"
+          git submodule update --remote --merge
+          git add .
+          git diff --cached --quiet || ( git commit -m "Sync submódulos" && git push )
 
