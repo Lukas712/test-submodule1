@@ -31,26 +31,15 @@ jobs:
       - name: Atualiza todos submódulos pra branch principal
         run: |
           cd mono-repo-with-submodules
-
           git config user.name "GitHub Bot"
           git config user.email "bot@example.com"
 
-          # Atualiza submódulos
+          # Atualiza os submódulos
           git submodule update --remote --merge
 
-          # Captura nome do submódulo (assumindo 1 submódulo)
-          SUBMODULE_PATH=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
-          cd $SUBMODULE_PATH
+          # Captura a mensagem do último commit do submódulo
+          submodule_commit_message=$(cd submodule-one && git log -1 --pretty=%B)
 
-          # Captura mensagem e hash do último commit
-          LAST_COMMIT_MSG=$(git log -1 --pretty=%s)
-          LAST_COMMIT_HASH=$(git rev-parse --short HEAD)
-
-          cd ../
-
-          # Adiciona e commita com mensagem personalizada
+          # Faz o commit no repositório pai com a mensagem do submódulo
           git add .
-
-          git diff --cached --quiet || \
-            git commit -m "Update submodule '$SUBMODULE_PATH' to ${LAST_COMMIT_HASH}: ${LAST_COMMIT_MSG}" && \
-            git push
+          git diff --cached --quiet || ( git commit -m "$submodule_commit_message" && git push )
