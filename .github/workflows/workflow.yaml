@@ -37,8 +37,18 @@ jobs:
           # Atualiza os submódulos
           git submodule update --remote --merge
 
+          # URL do repositório original do submódulo que você quer comparar
+          target_submodule_url="https://github.com/usuario/submodulo.git"
+
+          # Encontra o caminho do submódulo com o URL correspondente
+          submodule_path=$(git submodule foreach --quiet '
+            if [ "$sm_url" == "$target_submodule_url" ]; then
+              echo $sm_path
+            fi
+          ')
+
           # Captura a mensagem do último commit do submódulo
-          submodule_commit_message=$(cd submodule-one && git log -1 --pretty=%B)
+          submodule_commit_message=$(git log -1 --pretty=%B -- $submodule_path)
 
           # Faz o commit no repositório pai com a mensagem do submódulo
           git add .
