@@ -26,18 +26,15 @@ jobs:
           fetch-depth: 0
 
       - name: Espera 5 segundos para garantir visibilidade do commit
-        run: sleep 5
-
-      - name: Captura a mensagem do último commit
-        run: |
-          # Captura a mensagem do último commit no repositório atual
-          commit_message=$(git log -1 --pretty=%B)
-
+        run: sleep 5          
+        
       - name: Atualiza todos submódulos pra branch principal
         run: |
           cd mono-repo-with-submodules
           git config user.name "GitHub Bot"
           git config user.email "bot@example.com"
+
+          commit_message=$(git log -1 --pretty=%B)
 
           # Atualiza os submódulos
           git submodule update --remote --merge
